@@ -1,0 +1,62 @@
+{% extends "network/layout.html" %}
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        
+            // Like action
+            const likeBtn = document.querySelectorAll(".like");
+            likeBtn.forEach(like => {
+                like.onclick = () => {
+                    if (like.innerHTML === "Like") {
+                        like.innerHTML = "Unlike";
+                        postId = like.dataset.postid;
+                        console.log(postId);
+                        liked(postId, 'like');
+                    }
+                    else {
+                        like.innerHTML = "Like";
+                        postId = like.dataset.postid;
+                        liked(postId, 'unlike');
+                    }
+                }
+            })        
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="posts">
+        {% for post in posts %}
+            <div class="post {{ post.id}}">
+                <div style="font-weight: bold;"><a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a> <span class="time">{{ post.timestamp }}</span></div>
+                <div class="content{{ post.id }}">{{ post.content }}</div>
+                
+                <div id="likes" class="likes-of-{{ post.id }}">{{ post.likes }} Likes</div>
+                {% if user.is_authenticated %}
+                    {% if post.liked_by_user %}
+                        <button class="like" data-postid="{{ post.id }}">Unlike</button>
+                    {% else %}
+                        <button class="like" data-postid="{{ post.id }}">Like</button>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% empty %}
+            No Posts found.
+        {% endfor %}
+    </div>
+
+    <br/><hr>
+    <div class="pages">Page {{ posts.number }} of {{ posts.paginator.num_pages }}</div>
+    <div class="pagination">
+        {% if posts.has_previous %}
+            <a href="?page=1">&laquo&laquo</a>
+            <a href="?page={{ posts.previous_page_number }}">Previous</a>
+        {% endif %}
+        
+        {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}">Next</a>
+            <a href="?page={{ posts.paginator.num_pages }}">&raquo&raquo</a>
+        {% endif %}
+    </div>
+
+{% endblock %}

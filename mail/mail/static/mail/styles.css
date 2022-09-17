@@ -1,0 +1,76 @@
+textarea {
+    min-height: 400px;
+}
+
+.mail { 
+    border: black;
+    color: black;
+    padding: 12px 3px;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    margin-top: 10px;
+    border-style: solid;
+    width: 100%;
+    border-radius: 25px;
+}
+
+.mail:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+  }
+
+#mail-sender {
+    float: left;
+    font-weight: bold;
+}
+
+#mail-subject {
+    float: left;
+    margin-left: 1%;
+    font-family: 'Google Sans', Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+}
+
+#mail-time {
+    float: right;
+    color: grey;
+}
+
+@keyframes slide {
+    from {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        transform: translateY(-10%);
+        margin-top: 10%;
+        margin-bottom: 10%;
+    }
+
+    to {
+        box-shadow: none;
+        transform: translateY(0%);
+        margin-top: 10px;
+        margin-bottom: 0%;
+    }
+}
+
+.mail {
+    animation-name: slide;
+    animation-duration: 1s;
+    animation-fill-mode: backwards;
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+        transform: translateY(50%);
+    }    
+    
+    to {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+.fade {
+    animation-name: fade;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}

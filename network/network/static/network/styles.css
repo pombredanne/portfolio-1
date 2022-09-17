@@ -1,0 +1,59 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.3125rem;
+    line-height: 1.6;
+    color: #222C2A;
+}
+
+.posts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.post {
+    border: 0.1px solid gray;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px auto;
+}
+
+.time {
+    font-size: smaller;
+    color: gray;
+    font-weight: 100;
+}
+
+.post-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    gap: 5px;
+    margin: 30px auto;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.pages {
+    display: flex;
+    justify-content: center;
+}
+
+.post-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 0.5px solid black;
+}

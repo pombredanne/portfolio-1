@@ -1,0 +1,116 @@
+{% extends "network/layout.html" %}
+
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        
+            // Like action
+            const likeBtn = document.querySelectorAll(".like");
+            likeBtn.forEach(like => {
+                like.onclick = () => {
+                    if (like.innerHTML === "Like") {
+                        like.innerHTML = "Unlike";
+                        postId = like.dataset.postid;
+                        console.log(postId);
+                        liked(postId, 'like');
+                    }
+                    else {
+                        like.innerHTML = "Like";
+                        postId = like.dataset.postid;
+                        liked(postId, 'unlike');
+                    }
+                }
+            })
+
+            // Edit action
+            const EditBtn = document.querySelectorAll(".edit");
+            EditBtn.forEach(edit => {
+                edit.onclick = () => {
+                    postId = edit.dataset.postid;
+                    document.querySelector(`.editForm.${CSS.escape(postId)}`).style.display = 'block';
+                    document.querySelector(`.post.${CSS.escape(postId)}`).style.display = 'none';
+                    var elems = document.getElementsByClassName('edithide');
+                    for (var i = 0; i < elems.length; i += 1) {
+                        elems[i].style.display = 'none';
+                    }
+                    editing(postId);
+                }
+            })
+
+
+            // Follow action
+            document.querySelector(".flw-btn").onclick = () => {
+                if (document.querySelector(".flw-btn").innerHTML === "Follow") {
+                    document.querySelector(".flw-btn").innerHTML = "Unfollow";
+                    username = document.querySelector("#user").dataset.username;
+                    follow(username, 'follow');
+                }
+                else {
+                    document.querySelector(".flw-btn").innerHTML = "Follow";
+                    username = document.querySelector("#user").dataset.username;
+                    follow(username, 'unfollow');
+                }
+            }
+            
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="user" data-username="{{ profile.username }}">{{ profile.username }}</div>
+    <h3>Followers: <div id="followers">{{ followers }}</div></h3>
+    <h3>Following: <div id="following">{{ following }}</div></h3>
+    
+    {% if user.is_authenticated %}
+        {% if user.username != profile.username %}
+            {% if followed == True %}
+                <button class="flw-btn">Unfollow</button>
+            {% else %}
+                <button class="flw-btn">Follow</button>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+        
+
+    <div class="posts">
+        {% for post in posts %}
+            <div class="post {{ post.id}}">
+                <div style="font-weight: bold;"><a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a> <span class="time">{{ post.timestamp }}</span></div>
+                <div class="content{{ post.id }}">{{ post.content }}</div>
+                
+                <div id="likes" class="likes-of-{{ post.id }}">{{ post.likes }} Likes</div>
+                {% if user.is_authenticated %}
+                    {% if post.liked_by_user %}
+                        <button class="like" data-postid="{{ post.id }}">Unlike</button>
+                    {% else %}
+                        <button class="like" data-postid="{{ post.id }}">Like</button>
+                    {% endif %}
+                {% endif %}
+                {% if post.allow_edit %}
+                    <div class="edithide"><button class="edit" data-postid="{{ post.id }}">Edit</button></div>
+                {% endif %}
+            </div>
+            <div class="editForm {{ post.id}}" style="display: none;">
+                <input class="editedcontent{{ post.id }}" type="input" value="{{ post.content }}" maxlength="280">
+                <button class="save{{ post.id }}">Save Changes</button>
+            </div>
+        {% empty %}
+            No Posts found.
+        {% endfor %}
+    </div>
+
+    <br/><hr>
+    <div class="pages">Page {{ posts.number }} of {{ posts.paginator.num_pages }}</div>
+    <div class="pagination">
+        {% if posts.has_previous %}
+            <a href="?page=1">&laquo&laquo</a>
+            <a href="?page={{ posts.previous_page_number }}">Previous</a>
+        {% endif %}
+        
+        {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}">Next</a>
+            <a href="?page={{ posts.paginator.num_pages }}">&raquo&raquo</a>
+        {% endif %}
+    </div>
+
+{% endblock %}

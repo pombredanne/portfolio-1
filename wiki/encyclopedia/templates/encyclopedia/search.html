@@ -1,0 +1,18 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block body %}
+    <h2>Sorry, could not find the exact match. Here are some related pages:</h2>
+
+    <ul>
+        {% for entry in entries %}
+            <li><a href="wiki/{{ entry }}">{{ entry }}</a></li>
+        {% empty %}
+            <li>No matching pages found.</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

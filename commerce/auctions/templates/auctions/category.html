@@ -1,0 +1,15 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings in {{ category }} category</h2>
+    {% for listing in listings %}
+        <div class="container">
+            <div><img src="{{ listing.photo }}" style="height: 300px; width: auto;"></div>
+            <div><a href="{% url 'listing' listing.id %}"><strong>{{ listing.title }}</strong></a></div>
+            <div>Price: ${{ listing.highest }}</div>
+            <div>{{ listing.description }}</div>
+        </div>
+    {% empty %}
+        <div>No active listings avaialable in this category.</div>
+    {% endfor %}
+{% endblock %}

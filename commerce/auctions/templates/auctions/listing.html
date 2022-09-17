@@ -1,0 +1,88 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="list">
+        <h1>Listing: {{ listing.title }}</h1>
+        <img src="{{ listing.photo }}" style="height: 500px;">
+        <div>{{ lisitng.description }}</div>
+        <div>Price: ${{ listing.highest }}</div>
+    </div>
+    <ul>
+        <li>Listed by: {{ listing.owner }} </li>
+        <li>Category: {{ listing.category }}</li>
+    </ul>
+    {% if listing.active == False %}
+
+        {% if user.username == listing.winner.username %}
+
+            <div>You have won the auction at a bid of ${{ listing.highest }}.</div>
+
+        {% else %}
+
+            <div>This auction has been closed. {{ listing.winner }} has won the auction at a bid of ${{ listing.highest }}.</div>
+        
+        {% endif %}
+
+    {% else %}
+
+        {% if user.is_authenticated %}
+            {% if user.username != listing.owner.username %}
+                {% if watchlist.added.id == listing.id %}
+                    <form action="{% url 'watchlist' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{ listing.id }}" name="id">
+                        <input type="hidden" value="remove" name="action">
+                        <input type="submit" value="Remove From Watchlist">
+                    </form>
+                {% else %}
+                    <form action="{% url 'watchlist' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{ listing.id }}" name="id">
+                        <input type="hidden" value="add" name="action">
+                        <input type="submit" value="Add To Watchlist">
+                    </form>
+                {% endif %}
+
+                <form action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" placeholder="Bid" name="newBid">
+                    <div>{{ message }}</div>
+                    <input type="submit" value="Place Bid" name="bidding">
+                </form>
+            {% endif %}
+
+            {% if user.username == listing.owner.username %}
+                <form action="{% url 'index' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{ listing.id }}" name="id">
+                    {% if bidding.started %}
+                        <input type="hidden" value="{{ bidding.bidder }}" name="bidder">
+                        <input type="hidden" value="{{ bidding.highest }}" name="bid">
+                    {% else %}
+                        <input type="hidden" value="{{ listing.owner.username }}" name="bidder">
+                        <input type="hidden" value="{{ listing.highest }}" name="bid">
+                    {% endif %}
+                    <input type="submit" value="Close Auction">
+                </form>
+            {% endif %}
+
+            <form action="{% url 'listing' listing.id %}" method="post">
+                {% csrf_token %}
+                {{ commentForm }}
+                <input type="submit" value="Comment" name="commenting">
+            </form>
+
+        {% endif %}
+        <h3>Comments</h3>
+        {% for comment in comments %}
+            <div class="comments">
+                <div><strong>{{ comment.comment }}</strong></div>
+                <div>Added by: {{ comment.user.username }}</div>
+            </div>
+        {% empty %}
+            <div>No comments yet.</div>
+        {% endfor %}
+
+    {% endif %}
+
+{% endblock %}

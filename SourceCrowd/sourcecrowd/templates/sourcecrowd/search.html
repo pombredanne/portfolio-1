@@ -1,0 +1,156 @@
+{% extends "sourcecrowd/layout.html" %}
+{% load static %}
+
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function loader() {
+                document.querySelector(".loader").style.display = "none";
+                document.querySelector(".rest").style.display = "block";
+            }
+            
+            window.setTimeout(loader, 1000);
+
+
+            var isLoggedIn = "{{ request.user.is_authenticated }}";
+        
+            const upvoteBtn = document.querySelectorAll(".upvote");
+            upvoteBtn.forEach(vote => {
+                vote.onclick = () => {
+                    sourceId = vote.dataset.sourceid;
+                    voting('upvote', sourceId, vote, isLoggedIn);
+                }
+            })
+
+            // Downvote action
+            const downvoteBtn = document.querySelectorAll(".downvote");
+            downvoteBtn.forEach(vote => {
+                vote.onclick = () => {
+                    sourceId = vote.dataset.sourceid;
+                    voting('downvote', sourceId, vote, isLoggedIn);
+                }
+            })
+
+
+            // Save action
+            const saveBtn = document.querySelectorAll(".save");
+            saveBtn.forEach(save => {
+                save.onclick = () => {
+                    sourceId = save.dataset.sourceid;
+                    saving(save, sourceId, isLoggedIn);
+                }
+            })
+
+            const deleteBtn = document.querySelectorAll(".delete");
+            deleteBtn.forEach(deleted => {
+                deleted.onclick = () => {
+                    sourceId = deleted.dataset.sourceid;
+                    deleteModal(sourceId);
+                }
+            })
+
+
+            // Check Saved
+
+            if (isLoggedIn === "True") {
+                const checkSaveBtn = document.querySelectorAll(".save");
+                checkSaveBtn.forEach(save => {
+                    sourceId = save.dataset.sourceid;
+                    check_save(sourceId);
+                })
+
+            
+                const checkVoteBtn = document.querySelectorAll(".upvote");
+                checkVoteBtn.forEach(vote => {
+                    sourceId = vote.dataset.sourceid;
+                    check_vote(sourceId);
+                })
+            }
+            
+        })
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="loader">
+        <img class="loader-img" src="{% static 'sourcecrowd/logo.png' %}">
+    </div>
+
+    <div class="rest" style="display: none;">
+        <div class="container searchpage-title-logo">
+            <img class="mini-logo" src="{% static 'sourcecrowd/mini.png' %}">
+            <form action="{% url 'search' %}" method="get">
+                <input class="search-bar" type="search" autocomplete="on" placeholder="Enter your query..." value="{{ query }}" name="q" required>
+                <button class="theme-btn" type="submit">
+                    <span class="material-icons-round">search</span>
+                </button>
+            </form>
+        </div>
+        
+        <div>
+            {% for result in results %}
+                <div class="container source source{{ result.id }}">
+                    
+                    <div>
+                        <a href="{{ result.link }}" ping="{% url 'click' source_id=result.id %}" target="_blank" rel="external">
+                            <div class="link">{{ result.link }}</div>
+                            <h3 class="result-title">{{ result.title }}</h3>
+                        </a>
+                    </div>
+                    <div class="sourcerer"><span class="date">Sourced by:</span> {{ result.sourcerer }}</div>
+                    <div><span class="date">{{ result.date }} - </span><span class="description">{{ result.description }}</span></div>
+                    <div style="margin: 3px auto;">
+                        <span class="count">
+                            <span class="votes-of-{{ result.id }}">{{ result.votes_count }}</span>
+                            <span class="material-icons-round">poll</span>
+                        </span>
+                        <span class="count">
+                            <span>{{ result.clicks }}</span>
+                            <span class="material-icons-round">touch_app</span>
+                        </span>
+                    </div>
+                    <div style="margin: 10px auto;">
+                        <button class="vote-icons upvote upicon{{ result.id }}" data-sourceid="{{ result.id }}">
+                            <span class="material-icons-round up{{ result.id }}" data-sourceid="{{ result.id }}">arrow_upward</span>
+                        </button>
+                        <button class="vote-icons downvote downicon{{ result.id }}" data-sourceid="{{ result.id }}">
+                            <span class="material-icons-round down{{ result.id }}" data-sourceid="{{ result.id }}">arrow_downward</span>
+                        </button>
+                        <button class="icons"><span class="material-icons-round save save{{ result.id }}" data-sourceid="{{ result.id }}">bookmark_border</span></button>
+                        {% if user == result.sourcerer %}
+                            <button class="delete icons"  data-sourceid="{{ result.id }}">
+                                <span class="material-icons-round">delete</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+            <div class="container"><strong>No results found for your query. Please try another query.</strong></div>
+            {% endfor %}
+            <dialog class="delete-modal">
+                <h2>Are you sure you want to delete this source?</h2>
+                <p>This action cannot be undone.</p>
+                <div class="modal-btns">
+                    <button class="cancel-delete theme-btn">Cancel</button>
+                    <button class="confirm-delete theme-btn" data-sourceid="{{ result.id }}">Delete</button>
+                </div>
+            </dialog>
+        </div>
+        <br/>
+        <div class="container">Page {{ results.number }} of {{ results.paginator.num_pages }}</div>
+        <div class="container">
+            {% if results.has_previous %}
+                <a href="?q={{ query }}&page=1">&laquo</a>
+                <a href="?q={{ query }}&page={{ results.previous_page_number }}">Previous</a>
+            {% endif %}
+            
+            {% if results.has_next %}
+                <a href="?q={{ query }}&page={{ results.next_page_number }}">Next</a>
+                <a href="?q={{ query }}&page={{ results.paginator.num_pages }}">&raquo</a>
+            {% endif %}
+        </div>
+    </div>
+    
+{% endblock %}
